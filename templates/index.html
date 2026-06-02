@@ -225,7 +225,7 @@
           <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
             <div id="mpx-pilot-bar" class="vu-bar w-0 bg-green-400" style="height:100%"></div>
           </div>
-          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-65</span><span>-20 dBFS</span></div>
+          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-65</span><span>0 dBFS</span></div>
         </div>
 
         <div class="border-t border-gray-100"></div>
@@ -239,7 +239,7 @@
           <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
             <div id="mpx-rds-bar" class="vu-bar w-0 bg-purple-400" style="height:100%"></div>
           </div>
-          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-65</span><span>-20 dBFS</span></div>
+          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-65</span><span>0 dBFS</span></div>
         </div>
 
         <div class="border-t border-gray-100"></div>
@@ -253,7 +253,7 @@
           <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
             <div id="mpx-power-bar" class="vu-bar w-0 bg-blue-400" style="height:100%"></div>
           </div>
-          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-50</span><span>0 dBFS</span></div>
+          <div class="flex justify-between text-xs text-gray-400 font-mono mt-0.5"><span>-60</span><span>0 dBFS</span></div>
         </div>
 
         <div class="border-t border-gray-100"></div>
@@ -398,15 +398,15 @@ function applyStats(s) {
     const dbBar = (db, min, max) => Math.max(0, Math.min(100, ((db - min)/(max - min))*100));
     if (s.mpx_pilot_db !== null) {
       document.getElementById('mpx-pilot-val').textContent = s.mpx_pilot_db.toFixed(1) + ' dBFS';
-      document.getElementById('mpx-pilot-bar').style.width = dbBar(s.mpx_pilot_db, -65, -20) + '%';
+      document.getElementById('mpx-pilot-bar').style.width = dbBar(s.mpx_pilot_db, -65, 0) + '%';
     }
     if (s.mpx_rds_db !== null) {
       document.getElementById('mpx-rds-val').textContent = s.mpx_rds_db.toFixed(1) + ' dBFS';
-      document.getElementById('mpx-rds-bar').style.width = dbBar(s.mpx_rds_db, -65, -20) + '%';
+      document.getElementById('mpx-rds-bar').style.width = dbBar(s.mpx_rds_db, -65, 0) + '%';
     }
     if (s.mpx_power_db !== null) {
       document.getElementById('mpx-power-val').textContent = s.mpx_power_db.toFixed(1) + ' dBFS';
-      document.getElementById('mpx-power-bar').style.width = dbBar(s.mpx_power_db, -50, 0) + '%';
+      document.getElementById('mpx-power-bar').style.width = dbBar(s.mpx_power_db, -60, 0) + '%';
     }
 
   } catch(e) { console.error(e); }
