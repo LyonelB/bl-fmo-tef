@@ -1,0 +1,39 @@
+{
+  "station": {
+    "name": "Graffiti Radio",
+    "frequency": "101.3",
+    "country": "FR"
+  },
+  "tef": {
+    "port": "/dev/ttyUSB0",
+    "baudrate": 115200
+  },
+  "hifiberry": {
+    "alsa_device": "hw:2,0",
+    "software_gain": 20.0
+  },
+  "icecast": {
+    "host": "localhost",
+    "port": 8000,
+    "mount": "/stream.mp3",
+    "source_password": "hackme",
+    "bitrate": "128k"
+  },
+  "monitoring": {
+    "signal_threshold_dbuv": 35.0,
+    "alert_delay_seconds": 30
+  },
+  "email": {
+    "enabled": false,
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 587,
+    "use_tls": true,
+    "sender_email": "",
+    "sender_password": "",
+    "recipient_emails": []
+  },
+  "auth": {
+    "username": "admin",
+    "password_hash": ""
+  }
+}

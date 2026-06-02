@@ -1,0 +1,7 @@
+flask>=3.0
+flask-httpauth>=4.8
+flask-bcrypt>=1.0
+flask-wtf>=1.2
+python-dotenv>=1.0
+numpy>=1.26
+gunicorn>=21.0

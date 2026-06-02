@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BL-FMO-TEF — Statistiques</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:8px; color:#64748b; font-size:0.875rem; font-weight:500; transition:all 0.15s; text-decoration:none; }
+    .sidebar-link:hover, .sidebar-link.active { background:#eff6ff; color:#2563eb; }
+    .sidebar-link svg { width:18px; height:18px; flex-shrink:0; }
+    .card { background:white; border:1px solid #f1f5f9; border-radius:12px; padding:20px; }
+    .section-label { font-size:0.7rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; }
+    .log-line { padding:1px 0; white-space:pre-wrap; word-break:break-all; }
+    .log-error   { color:#f87171; }
+    .log-warning { color:#fbbf24; }
+    .log-info    { color:#34d399; }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-slate-50">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="w-64 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 h-screen">
+  <div class="p-5 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">TEF</div>
+      <div>
+        <div class="text-sm font-semibold text-gray-900">BL-FMO-TEF</div>
+        <div class="text-xs text-gray-400 font-mono" id="sidebar-frequency">— MHz</div>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+    <a href="/" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </a>
+    <a href="/config" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+      Configuration
+    </a>
+    <a href="/stats" class="sidebar-link active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Statistiques
+    </a>
+    <a href="/about" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      À propos
+    </a>
+    <a href="https://github.com/LyonelB/bl-fmo-tef" target="_blank" class="sidebar-link">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="p-4 border-t border-gray-100">
+    <a href="/logout" class="sidebar-link" style="color:#f87171" onmouseover="this.style.background='#fff1f2';this.style.color='#dc2626'" onmouseout="this.style.background='';this.style.color='#f87171'">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Déconnexion
+    </a>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="flex-1 overflow-y-auto">
+  <header class="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10">
+    <h1 class="text-base font-semibold text-gray-900">Statistiques</h1>
+    <p class="text-xs text-gray-400 mt-0.5">Historique signal, alertes et logs système</p>
+  </header>
+
+  <div class="p-6 space-y-5">
+
+    <!-- ── Cartes résumé ── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card">
+        <div class="section-label mb-2">Uptime</div>
+        <div class="text-2xl font-bold font-mono text-gray-900" id="uptime">0h 0m</div>
+      </div>
+      <div class="card">
+        <div class="section-label mb-2">Total alertes</div>
+        <div class="text-2xl font-bold font-mono text-gray-900" id="total-alerts">0</div>
+      </div>
+      <div class="card">
+        <div class="section-label mb-2">Démarré le</div>
+        <div class="text-lg font-semibold font-mono text-gray-900" id="start-time">—</div>
+      </div>
+    </div>
+
+    <!-- ── Historique alertes ── -->
+    <div class="card">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4">Historique des alertes</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 rounded-l-lg">Date</th>
+              <th class="px-4 py-3">Heure</th>
+              <th class="px-4 py-3">Type</th>
+              <th class="px-4 py-3 rounded-r-lg">Message</th>
+            </tr>
+          </thead>
+          <tbody id="alerts-tbody" class="divide-y divide-gray-100">
+            <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Logs système ── -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-gray-700">Logs système (100 dernières lignes)</h3>
+        <button onclick="loadLogs()" class="text-xs text-blue-600 hover:underline">↻ Rafraîchir</button>
+      </div>
+      <div id="log-container" class="bg-gray-900 text-gray-300 p-4 rounded-lg font-mono text-xs h-80 overflow-y-auto">
+        Chargement des logs…
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ── Cartes résumé + sidebar ──
+  async function updateStats() {
+    try {
+      const s = await fetch('/api/stats', {credentials:'include'}).then(r => r.json());
+      const up = s.uptime || 0;
+      document.getElementById('uptime').textContent =
+        Math.floor(up/3600) + 'h ' + Math.floor((up%3600)/60) + 'm';
+      document.getElementById('total-alerts').textContent = s.alerts_sent || 0;
+      if (s.start_time) document.getElementById('start-time').textContent = s.start_time;
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadSidebarFreq() {
+    try {
+      const cfg = await fetch('/api/config/full', {credentials:'include'}).then(r => r.json());
+      const freq = cfg.station?.frequency ? cfg.station.frequency + ' MHz' : '— MHz';
+      document.getElementById('sidebar-frequency').textContent = freq;
+    } catch(e) {}
+  }
+
+  // ── Historique alertes ──
+  const TYPE_LABELS = {
+    'signal_lost':     {label:'Signal perdu',  cls:'bg-red-100 text-red-700'},
+    'signal_restored': {label:'Signal rétabli',cls:'bg-green-100 text-green-700'},
+  };
+  async function loadAlerts() {
+    try {
+      const alerts = await fetch('/api/alerts/history', {credentials:'include'}).then(r => r.json());
+      const tbody = document.getElementById('alerts-tbody');
+      if (!alerts.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">Aucune alerte enregistrée</td></tr>';
+        return;
+      }
+      tbody.innerHTML = alerts.map(a => {
+        const d = new Date(a.ts);
+        const t = TYPE_LABELS[a.kind] || {label:a.kind, cls:'bg-gray-100 text-gray-700'};
+        return `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-medium text-gray-700">${d.toLocaleDateString('fr-FR')}</td>
+          <td class="px-4 py-3 font-mono text-xs text-gray-500">${d.toLocaleTimeString('fr-FR')}</td>
+          <td class="px-4 py-3"><span class="px-2 py-1 text-xs font-medium rounded ${t.cls}">${t.label}</span></td>
+          <td class="px-4 py-3 text-gray-600">${a.message}</td>
+        </tr>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('alerts-tbody').innerHTML =
+        '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Erreur de chargement</td></tr>';
+    }
+  }
+
+  // ── Logs ──
+  async function loadLogs() {
+    try {
+      const data = await fetch('/api/logs', {credentials:'include'}).then(r => r.json());
+      const c = document.getElementById('log-container');
+      const lines = (data.logs || '').split('\n');
+      c.innerHTML = lines.map(line => {
+        let cls = 'log-line';
+        if (line.includes('ERROR')) cls += ' log-error';
+        else if (line.includes('WARNING')) cls += ' log-warning';
+        else if (line.includes('INFO')) cls += ' log-info';
+        return `<div class="${cls}">${line.replace(/</g,'&lt;')}</div>`;
+      }).join('');
+      c.scrollTop = c.scrollHeight;
+    } catch(e) { console.error(e); }
+  }
+
+  // ── Init ──
+  updateStats();
+  loadSidebarFreq();
+  loadAlerts();
+  loadLogs();
+
+  setInterval(updateStats, 5000);
+  setInterval(loadAlerts, 60000);
+</script>
+</body>
+</html>

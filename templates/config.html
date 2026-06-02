@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BL-FMO-TEF — Configuration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:8px; color:#64748b; font-size:0.875rem; font-weight:500; transition:all 0.15s; text-decoration:none; }
+    .sidebar-link:hover, .sidebar-link.active { background:#eff6ff; color:#2563eb; }
+    .sidebar-link svg { width:18px; height:18px; flex-shrink:0; }
+    .section { background:white; border:1px solid #f1f5f9; border-radius:12px; padding:20px; margin-bottom:16px; }
+    .section-title { font-size:0.75rem; font-weight:700; color:#2563eb; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .field-label { font-size:0.75rem; color:#6b7280; font-weight:500; margin-bottom:4px; }
+    .field-hint  { font-size:0.7rem; color:#9ca3af; margin-top:3px; }
+    .field-input { width:100%; padding:8px 12px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.875rem; color:#111827; outline:none; transition:border 0.15s; background:white; }
+    .field-input:focus { border-color:#2563eb; box-shadow:0 0 0 3px #eff6ff; }
+    .field-input[readonly] { background:#f9fafb; color:#6b7280; }
+    .btn-primary   { background:#2563eb; color:white; padding:8px 20px; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer; border:none; transition:background 0.15s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary:hover   { background:#1d4ed8; }
+    .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
+    .btn-secondary { background:white; color:#374151; padding:8px 20px; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer; border:1px solid #e5e7eb; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; text-decoration:none; }
+    .btn-secondary:hover { border-color:#2563eb; color:#2563eb; }
+    .btn-danger    { background:#fee2e2; color:#dc2626; padding:8px 20px; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer; border:none; transition:background 0.15s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-danger:hover    { background:#fecaca; }
+    .eye-btn { position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#9ca3af; background:none; border:none; cursor:pointer; padding:2px; line-height:0; }
+    .eye-btn:hover { color:#4b5563; }
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:0.875rem; font-weight:500; z-index:999; transform:translateY(80px); opacity:0; transition:all 0.3s; max-width:380px; pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { background:#d1fae5; color:#065f46; }
+    .toast.error   { background:#fee2e2; color:#991b1b; }
+    .toast.warning { background:#fef3c7; color:#92400e; }
+    .toast.info    { background:#dbeafe; color:#1e40af; }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-slate-50">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="w-64 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 h-screen">
+  <div class="p-5 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">TEF</div>
+      <div>
+        <div class="text-sm font-semibold text-gray-900">BL-FMO-TEF</div>
+        <div class="text-xs text-gray-400 font-mono" id="sidebar-frequency">— MHz</div>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+    <a href="/" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </a>
+    <a href="/config" class="sidebar-link active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+      Configuration
+    </a>
+    <a href="/stats" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Statistiques
+    </a>
+    <a href="/about" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      À propos
+    </a>
+    <a href="https://github.com/LyonelB/bl-fmo-tef" target="_blank" class="sidebar-link">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="p-4 border-t border-gray-100">
+    <a href="/logout" class="sidebar-link" style="color:#f87171" onmouseover="this.style.background='#fff1f2';this.style.color='#dc2626'" onmouseout="this.style.background='';this.style.color='#f87171'">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Déconnexion
+    </a>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="flex-1 overflow-y-auto">
+  <header class="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10">
+    <h1 class="text-base font-semibold text-gray-900">Configuration</h1>
+    <p class="text-xs text-gray-400 mt-0.5">Paramètres du monitoring TEF6686 + HifiBerry</p>
+  </header>
+
+  <div class="p-6 max-w-3xl">
+
+    <!-- ── 1. STATION & TEF6686 ─────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        1. Station &amp; Tuner TEF6686
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <div class="field-label">Fréquence FM</div>
+          <input type="text" id="frequency" class="field-input" placeholder="101.3">
+          <div class="field-hint">Format : 101.3, 88.6…</div>
+        </div>
+        <div>
+          <div class="field-label">Nom de la station</div>
+          <input type="text" id="station-name" class="field-input" placeholder="Graffiti Radio">
+          <div class="field-hint">Affiché dans l'interface</div>
+        </div>
+        <div></div>
+        <div>
+          <div class="field-label">Port série TEF6686</div>
+          <input type="text" id="tef-port" class="field-input" placeholder="/dev/ttyUSB0">
+          <div class="field-hint">CH340 → généralement /dev/ttyUSB0</div>
+        </div>
+        <div>
+          <div class="field-label">Baudrate</div>
+          <input type="number" id="tef-baudrate" class="field-input" placeholder="115200">
+          <div class="field-hint">PE5PVB : 115200</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. HIFIBERRY / MPX ───────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        2. HifiBerry DAC+ ADC (capture MPX)
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-2">
+        <div>
+          <div class="field-label">Device ALSA</div>
+          <input type="text" id="alsa-device" class="field-input" placeholder="hw:2,0">
+          <div class="field-hint">Carte capture — voir <code>arecord -l</code></div>
+        </div>
+        <div>
+          <div class="field-label">Gain logiciel (×)</div>
+          <div class="flex items-center gap-3">
+            <input type="range" id="software-gain" min="1" max="50" step="1" value="20"
+              class="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              oninput="document.getElementById('software-gain-value').textContent = this.value + '×'">
+            <span id="software-gain-value" class="w-10 text-right font-mono text-sm font-semibold text-gray-900">20×</span>
+          </div>
+          <div class="field-hint">Amplification numérique du signal MPX capturé (temporaire jusqu'au réglage du volume sur le poste)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. ICECAST ───────────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H2v6h4l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>
+        3. Streaming Icecast
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <div class="field-label">Hôte</div>
+          <input type="text" id="icecast-host" class="field-input" placeholder="localhost">
+        </div>
+        <div>
+          <div class="field-label">Port</div>
+          <input type="number" id="icecast-port" class="field-input" placeholder="8000">
+        </div>
+        <div>
+          <div class="field-label">Mount</div>
+          <input type="text" id="icecast-mount" class="field-input" placeholder="/stream.mp3">
+        </div>
+        <div>
+          <div class="field-label">Mot de passe source</div>
+          <div class="relative">
+            <input type="password" id="icecast-password" class="field-input" placeholder="Laisser vide pour ne pas modifier" style="padding-right:36px">
+            <button type="button" class="eye-btn" onclick="togglePass('icecast-password','icecast-eye-icon')">
+              <svg id="icecast-eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">Bitrate</div>
+          <select id="icecast-bitrate" class="field-input">
+            <option value="64k">64 kbps</option>
+            <option value="96k">96 kbps</option>
+            <option value="128k">128 kbps</option>
+            <option value="192k">192 kbps</option>
+            <option value="256k">256 kbps</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. SURVEILLANCE ──────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        4. Surveillance &amp; Seuils
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <div class="field-label">Seuil signal perdu (dBµV)</div>
+          <input type="number" id="signal-threshold" class="field-input" placeholder="35" step="0.5">
+          <div class="field-hint">Niveau en dessous duquel le signal est considéré perdu</div>
+        </div>
+        <div>
+          <div class="field-label">Délai alerte (s)</div>
+          <input type="number" id="alert-delay" class="field-input" placeholder="30">
+          <div class="field-hint">Durée sous le seuil avant alerte email</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. EMAIL ─────────────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        5. Alertes email (Gmail)
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <div class="field-label">Activer les alertes</div>
+          <label class="relative inline-flex items-center cursor-pointer mt-1.5">
+            <input type="checkbox" id="email-enabled" class="sr-only peer">
+            <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+            <span class="ml-2 text-xs font-medium text-gray-700" id="email-enabled-label">Désactivé</span>
+          </label>
+        </div>
+        <div></div>
+        <div>
+          <div class="field-label">Email expéditeur</div>
+          <input type="email" id="sender-email" class="field-input" placeholder="votre.email@gmail.com">
+        </div>
+        <div>
+          <div class="field-label">Mot de passe application</div>
+          <div class="relative">
+            <input type="password" id="sender-password" class="field-input" placeholder="Laisser vide pour ne pas modifier" style="padding-right:36px">
+            <button type="button" class="eye-btn" onclick="togglePass('sender-password','eye-icon')">
+              <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+          <div class="field-hint"><a href="https://support.google.com/accounts/answer/185833" target="_blank" class="text-blue-500 hover:underline">→ Créer un mot de passe application Gmail</a></div>
+        </div>
+        <div class="col-span-2">
+          <div class="field-label">Emails destinataires</div>
+          <input type="text" id="recipient-emails" class="field-input" placeholder="alerte1@exemple.com, alerte2@exemple.com">
+          <div class="field-hint">Séparer par des virgules</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="sendTestEmail()" id="test-email-btn" class="btn-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Email de test
+        </button>
+        <span id="test-email-result" class="text-xs text-gray-400 hidden"></span>
+      </div>
+    </div>
+
+    <!-- ── 6. AUTHENTIFICATION ──────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        6. Authentification
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <div class="field-label">Utilisateur actuel</div>
+          <input type="text" id="current-username" class="field-input" readonly>
+        </div>
+        <div>
+          <div class="field-label">Nouveau nom d'utilisateur</div>
+          <input type="text" id="new-username" class="field-input" placeholder="Laisser vide pour ne pas changer">
+        </div>
+        <div></div>
+        <div>
+          <div class="field-label">Nouveau mot de passe</div>
+          <div class="relative">
+            <input type="password" id="new-password" class="field-input" placeholder="Min. 8 caractères" style="padding-right:36px">
+            <button type="button" class="eye-btn" onclick="togglePass('new-password','new-password-eye-icon')">
+              <svg id="new-password-eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">Confirmer le mot de passe</div>
+          <div class="relative">
+            <input type="password" id="confirm-password" class="field-input" placeholder="Retapez le mot de passe" style="padding-right:36px">
+            <button type="button" class="eye-btn" onclick="togglePass('confirm-password','confirm-password-eye-icon')">
+              <svg id="confirm-password-eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. SAUVEGARDE ────────────────────────────────────────── -->
+    <div class="section">
+      <div class="section-title">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+        7. Sauvegarde &amp; Restauration
+      </div>
+      <div class="field-hint mb-4">Le fichier ZIP contient <code>config.json</code> et <code>.env</code>.</div>
+      <div class="flex items-center gap-3 flex-wrap">
+        <a href="/api/config/export" class="btn-secondary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Exporter la configuration
+        </a>
+        <label class="btn-secondary cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span id="import-label-text">Importer un backup</span>
+          <input type="file" id="importInput" accept=".zip" class="hidden" onchange="importConfig(this)">
+        </label>
+        <span id="import-result" class="text-xs text-gray-400 hidden"></span>
+      </div>
+    </div>
+
+    <!-- ── Boutons ──────────────────────────────────────────────── -->
+    <div class="flex items-center justify-between pb-10">
+      <div class="flex items-center gap-3">
+        <button id="save-btn" onclick="saveConfig()" class="btn-primary">
+          <svg id="save-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span id="save-label">Enregistrer la configuration</span>
+        </button>
+        <button onclick="loadConfig()" class="btn-secondary">Annuler</button>
+      </div>
+      <button onclick="restartMonitoring()" class="btn-danger">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Redémarrer monitoring
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  function getCSRFToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.content : '';
+  }
+
+  function showToast(text, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = text;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => { toast.className = `toast ${type}`; }, 4000);
+  }
+
+  const EYE_OPEN  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+  const EYE_CLOSE = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>';
+
+  function togglePass(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    input.type  = input.type === 'password' ? 'text' : 'password';
+    icon.innerHTML = input.type === 'password' ? EYE_OPEN : EYE_CLOSE;
+  }
+
+  // Toggle label email
+  document.getElementById('email-enabled').addEventListener('change', function() {
+    document.getElementById('email-enabled-label').textContent = this.checked ? 'Activé' : 'Désactivé';
+  });
+
+  // ── LOAD CONFIG ────────────────────────────────────────────
+  async function loadConfig() {
+    try {
+      const cfg = await fetch('/api/config/full', {credentials:'include'}).then(r => r.json());
+
+      document.getElementById('frequency').value      = cfg.station?.frequency || '';
+      document.getElementById('station-name').value   = cfg.station?.name || '';
+      document.getElementById('tef-port').value        = cfg.tef?.port || '/dev/ttyUSB0';
+      document.getElementById('tef-baudrate').value    = cfg.tef?.baudrate || 115200;
+
+      document.getElementById('alsa-device').value     = cfg.hifiberry?.alsa_device || 'hw:2,0';
+      const gain = cfg.hifiberry?.software_gain || 20;
+      document.getElementById('software-gain').value   = gain;
+      document.getElementById('software-gain-value').textContent = gain + '×';
+
+      document.getElementById('icecast-host').value    = cfg.icecast?.host || 'localhost';
+      document.getElementById('icecast-port').value    = cfg.icecast?.port || 8000;
+      document.getElementById('icecast-mount').value   = cfg.icecast?.mount || '/stream.mp3';
+      document.getElementById('icecast-password').value= '';
+      document.getElementById('icecast-bitrate').value = cfg.icecast?.bitrate || '128k';
+
+      document.getElementById('signal-threshold').value = cfg.monitoring?.signal_threshold_dbuv ?? 35;
+      document.getElementById('alert-delay').value       = cfg.monitoring?.alert_delay_seconds ?? 30;
+
+      const emailOn = cfg.email?.enabled || false;
+      document.getElementById('email-enabled').checked = emailOn;
+      document.getElementById('email-enabled-label').textContent = emailOn ? 'Activé' : 'Désactivé';
+      document.getElementById('sender-email').value    = cfg.email?.sender_email || '';
+      document.getElementById('sender-password').value = '';
+      let recip = cfg.email?.recipient_emails || '';
+      if (Array.isArray(recip)) recip = recip.join(', ');
+      document.getElementById('recipient-emails').value = recip;
+
+      document.getElementById('current-username').value = cfg.auth?.username || 'admin';
+
+      const freq = cfg.station?.frequency ? cfg.station.frequency + ' MHz' : '— MHz';
+      document.getElementById('sidebar-frequency').textContent = freq;
+
+    } catch (e) {
+      console.error('Erreur chargement config:', e);
+      showToast('Erreur lors du chargement de la configuration', 'error');
+    }
+  }
+
+  // ── SAVE CONFIG ────────────────────────────────────────────
+  async function saveConfig() {
+    const newUsername     = document.getElementById('new-username').value.trim();
+    const newPassword     = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword || confirmPassword) {
+      if (newPassword !== confirmPassword) { showToast('Les mots de passe ne correspondent pas', 'error'); return; }
+      if (newPassword.length < 8) { showToast('Le mot de passe doit contenir au moins 8 caractères', 'error'); return; }
+    }
+
+    const payload = {
+      station: {
+        name:      document.getElementById('station-name').value,
+        frequency: document.getElementById('frequency').value
+      },
+      tef: {
+        port:     document.getElementById('tef-port').value,
+        baudrate: parseInt(document.getElementById('tef-baudrate').value) || 115200
+      },
+      hifiberry: {
+        alsa_device:   document.getElementById('alsa-device').value,
+        software_gain: parseFloat(document.getElementById('software-gain').value) || 20
+      },
+      icecast: {
+        host:            document.getElementById('icecast-host').value,
+        port:            parseInt(document.getElementById('icecast-port').value) || 8000,
+        mount:           document.getElementById('icecast-mount').value,
+        source_password: document.getElementById('icecast-password').value,  // vide = inchangé (géré backend)
+        bitrate:         document.getElementById('icecast-bitrate').value
+      },
+      monitoring: {
+        signal_threshold_dbuv: parseFloat(document.getElementById('signal-threshold').value) || 35,
+        alert_delay_seconds:   parseInt(document.getElementById('alert-delay').value) || 30
+      },
+      email: {
+        enabled:          document.getElementById('email-enabled').checked,
+        sender_email:     document.getElementById('sender-email').value,
+        sender_password:  document.getElementById('sender-password').value,  // vide = inchangé
+        recipient_emails: document.getElementById('recipient-emails').value.split(',').map(e => e.trim()).filter(Boolean)
+      }
+    };
+
+    if (newUsername || newPassword) {
+      payload.auth = {};
+      if (newUsername) payload.auth.username = newUsername;
+      if (newPassword) payload.auth.password = newPassword;  // backend hashera
+    }
+
+    const btn = document.getElementById('save-btn');
+    const label = document.getElementById('save-label');
+    const icon = document.getElementById('save-icon');
+    btn.disabled = true;
+    icon.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></circle>';
+    label.textContent = 'Enregistrement…';
+
+    try {
+      const resp = await fetch('/api/config/save', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+        body: JSON.stringify(payload)
+      });
+      const result = await resp.json();
+      if (result.ok || result.status === 'success') {
+        showToast('Configuration enregistrée. Redémarrez le monitoring pour appliquer.', 'success');
+      } else {
+        showToast('Erreur : ' + (result.error || result.message || 'Échec'), 'error');
+      }
+    } catch (e) {
+      showToast('Erreur lors de la sauvegarde', 'error');
+    } finally {
+      btn.disabled = false;
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+      label.textContent = 'Enregistrer la configuration';
+      loadConfig();
+    }
+  }
+
+  // ── TEST EMAIL ─────────────────────────────────────────────
+  async function sendTestEmail() {
+    const btn = document.getElementById('test-email-btn');
+    const result = document.getElementById('test-email-result');
+    btn.disabled = true;
+    result.className = 'text-xs hidden';
+    try {
+      const resp = await fetch('/api/test-email', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        result.textContent = '✓ Email envoyé';
+        result.className   = 'text-xs text-green-600';
+      } else {
+        result.textContent = '✗ ' + (data.message || 'Erreur');
+        result.className   = 'text-xs text-red-600';
+      }
+    } catch (e) {
+      result.textContent = '✗ Erreur réseau';
+      result.className   = 'text-xs text-red-600';
+    } finally {
+      btn.disabled = false;
+      result.classList.remove('hidden');
+    }
+  }
+
+  // ── IMPORT CONFIG ──────────────────────────────────────────
+  async function importConfig(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (!confirm(`Importer "${file.name}" ?`)) { input.value = ''; return; }
+    const labelText = document.getElementById('import-label-text');
+    const result = document.getElementById('import-result');
+    labelText.textContent = 'Import…';
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const resp = await fetch('/api/config/import', { method: 'POST', body: formData, credentials: 'include' });
+      const data = await resp.json();
+      if (data.success || data.ok) {
+        result.textContent = '✓ Restauré';
+        result.className = 'text-xs text-green-600';
+        showToast('Restauration OK — redémarrez le monitoring', 'success');
+        setTimeout(() => loadConfig(), 1000);
+      } else {
+        result.textContent = '✗ ' + (data.error || 'Erreur');
+        result.className = 'text-xs text-red-600';
+      }
+    } catch (e) {
+      result.textContent = '✗ Erreur réseau';
+      result.className = 'text-xs text-red-600';
+    } finally {
+      labelText.textContent = 'Importer un backup';
+      result.classList.remove('hidden');
+      input.value = '';
+    }
+  }
+
+  // ── RESTART ────────────────────────────────────────────────
+  async function restartMonitoring() {
+    if (!confirm('Redémarrer le monitoring ?')) return;
+    try {
+      const resp = await fetch('/api/restart', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        showToast('Monitoring redémarré', 'success');
+      } else {
+        showToast('Erreur : ' + (data.message || 'Échec'), 'error');
+      }
+    } catch (e) {
+      showToast('Erreur lors du redémarrage', 'error');
+    }
+  }
+
+  loadConfig();
+</script>
+</body>
+</html>

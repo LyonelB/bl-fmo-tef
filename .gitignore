@@ -1,10 +1,26 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
-.env
-config.json
-*.log
 venv/
 .venv/
+
+# Secrets & config locale
+.env
+config.json
+
+# Base de données
 *.db
+
+# Logs
+*.log
+
+# SSL
 ssl/
+
+# Scripts de patch (migration ponctuelle, déjà appliqués)
+patch_*.py
+*.bak
+
+# Cache rds-station-db
+.cache/

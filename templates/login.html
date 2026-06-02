@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BL-FMO-TEF — Connexion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .field-input { width:100%; padding:8px 12px 8px 36px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.875rem; color:#111827; outline:none; transition:border 0.15s; background:white; }
+    .field-input:focus { border-color:#2563eb; box-shadow:0 0 0 3px #eff6ff; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+
+  <div class="w-full max-w-sm">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">TEF</div>
+      <h1 class="text-lg font-semibold text-gray-900">BL-FMO-TEF</h1>
+      <p class="text-xs text-gray-400 mt-1">Monitoring FM · TEF6686 + HifiBerry</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white border border-gray-100 rounded-xl p-7 shadow-sm">
+
+      <h2 class="text-sm font-semibold text-gray-700 mb-5">Connexion</h2>
+
+      <!-- Message d'erreur -->
+      <div id="error-message" class="hidden mb-4 bg-red-50 border border-red-100 rounded-lg px-4 py-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <p class="text-xs text-red-700" id="error-text">Nom d'utilisateur ou mot de passe incorrect</p>
+      </div>
+
+      <!-- Formulaire -->
+      <form id="login-form" class="space-y-4">
+
+        <!-- Username -->
+        <div>
+          <div class="text-xs text-gray-500 font-medium mb-1">Nom d'utilisateur</div>
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <input type="text" id="username" name="username" required autocomplete="username"
+              class="field-input" placeholder="Nom d'utilisateur">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <div class="text-xs text-gray-500 font-medium mb-1">Mot de passe</div>
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <input type="password" id="password" name="password" required autocomplete="current-password"
+              class="field-input" placeholder="Mot de passe">
+          </div>
+        </div>
+
+        <!-- Remember me -->
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="remember" name="remember"
+            class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+          <label for="remember" class="text-xs text-gray-600 cursor-pointer">Se souvenir de moi</label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submit-button"
+          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2">
+          <span id="button-text">Se connecter</span>
+          <span id="button-spinner" class="hidden">
+            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Connexion…
+          </span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-6">
+      <p class="text-xs text-gray-400">BL-FMO-TEF · Monitoring radio FM · © 2026</p>
+    </div>
+
+  </div>
+
+  <script>
+    function getCSRFToken() {
+      const meta = document.querySelector('meta[name="csrf-token"]');
+      return meta ? meta.content : '';
+    }
+
+    const form          = document.getElementById('login-form');
+    const errorMessage  = document.getElementById('error-message');
+    const errorText     = document.getElementById('error-text');
+    const submitButton  = document.getElementById('submit-button');
+    const buttonText    = document.getElementById('button-text');
+    const buttonSpinner = document.getElementById('button-spinner');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMessage.classList.add('hidden');
+
+      submitButton.disabled = true;
+      buttonText.classList.add('hidden');
+      buttonSpinner.classList.remove('hidden');
+
+      const formData = new FormData(form);
+      const data = {
+        username: formData.get('username'),
+        password: formData.get('password'),
+        remember: formData.get('remember') === 'on'
+      };
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+
+        if (response.ok && result.status === 'success') {
+          window.location.href = result.redirect || '/';
+        } else {
+          errorText.textContent = result.message || "Nom d'utilisateur ou mot de passe incorrect";
+          errorMessage.classList.remove('hidden');
+          submitButton.disabled = false;
+          buttonText.classList.remove('hidden');
+          buttonSpinner.classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Erreur de connexion:', error);
+        errorText.textContent = 'Erreur de connexion au serveur';
+        errorMessage.classList.remove('hidden');
+        submitButton.disabled = false;
+        buttonText.classList.remove('hidden');
+        buttonSpinner.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('username').focus();
+  </script>
+</body>
+</html>

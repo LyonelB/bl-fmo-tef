@@ -1,0 +1,20 @@
+[Unit]
+Description=BL-FMO-TEF FM Monitoring (TEF6686 + HifiBerry)
+After=network.target sound.target icecast2.service
+Wants=icecast2.service
+
+[Service]
+Type=simple
+User=graffiti
+Group=graffiti
+WorkingDirectory=/home/graffiti/bl-fmo-tef
+Environment=PORT=5000
+# Démarrage via Gunicorn (1 worker, gthread)
+ExecStart=/home/graffiti/.local/bin/gunicorn -c gunicorn_config.py app:app
+Restart=on-failure
+RestartSec=5
+# Accès au device série et audio
+SupplementaryGroups=dialout audio
+
+[Install]
+WantedBy=multi-user.target
